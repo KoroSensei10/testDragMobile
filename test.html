@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            .inventory-slot {
+                width: 100px;
+                height: 100px;
+                border: 2px solid black;
+                margin: 5px;
+                float: left;
+            }
+
+            .draggable-item {
+                width: 80px;
+                height: 80px;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="inventory">
+            <div class="inventory-slot"></div>
+            <div class="inventory-slot"></div>
+        </div>
+
+        <div id="game-scene">
+            <img src="image1.png" class="draggable-item" />
+            <img src="image1.png" class="draggable-item" />
+            <span class="draggable-item" draggable="true">Potion</span>
+        </div>
+    </body>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const inventorySlots = document.querySelectorAll(".inventory-slot");
+            const draggableItems = document.querySelectorAll(".draggable-item");
+
+            draggableItems.forEach((item) => {
+                item.addEventListener("dragstart", dragStart);
+            });
+
+            inventorySlots.forEach((slot) => {
+                slot.addEventListener("dragover", dragOver);
+                slot.addEventListener("drop", dropItem);
+            });
+
+            let draggedItem = null;
+
+            function dragStart(event) {
+                draggedItem = event.target.cloneNode(true); // Cloner l'élément pour le déplacer
+                event.dataTransfer.effectAllowed = "move";
+            }
+
+            function dragOver(event) {
+                event.preventDefault();
+            }
+
+            function dropItem(event) {
+                event.preventDefault();
+                if (!event.target.classList.contains("draggable-item")) {
+                    // Ajouter l'élément à la case d'inventaire
+                    const newItem = draggedItem.cloneNode(true);
+                    event.target.appendChild(newItem);
+                    newItem.addEventListener("dragstart", (event) => {
+                        dragStart(event);
+                    });
+                    newItem.addEventListener("dragend", (event) => {
+                        event.preventDefault();
+                        removeItem(event);
+                    });
+                }
+            }
+        });
+        function removeItem(event) {
+            const item = event.target;
+            const parentSlot = item.parentNode;
+            parentSlot.removeChild(item);
+        }
+
+        document.addEventListener("dragenter", (e) => {
+            e.preventDefault();
+        });
+        document.addEventListener("dragover", (e) => {
+            e.preventDefault();
+        });
+    </script>
+</html>
